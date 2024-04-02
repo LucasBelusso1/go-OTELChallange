@@ -1,0 +1,18 @@
+version: '3'
+services:
+  cepvalidation:
+    container_name: cepvalidation
+    build:
+      context: ./cepvalidation
+    ports:
+      - "8080:8080"
+
+  weatherbycep:
+    container_name: weatherbycep
+    build:
+      context: ./weatherbycep
+    environment:
+      - WEATHER_API_KEY=e13349934b663c68c345b123833241902
+    ports:
+      - "8081:8081"
+      - "4040:4040"
