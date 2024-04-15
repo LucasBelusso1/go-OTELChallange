@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"regexp"
 
@@ -48,8 +49,16 @@ func ValidateCEPAndDispatch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Something went wrong"))
+		w.WriteHeader(res.StatusCode)
+		body, err := io.ReadAll(res.Body)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(body)
 		return
 	}
 
