@@ -14,13 +14,13 @@ func ValidateCEPAndDispatch(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&cepRequestBody)
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		w.Write([]byte(err.Error()))
+		w.Write([]byte("Invalid zipcode"))
 		return
 	}
 
 	if len(cepRequestBody.Cep) != 8 {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		w.Write([]byte("Cep length validation was not passed"))
+		w.Write([]byte("Invalid zipcode"))
 		return
 	}
 
@@ -35,7 +35,7 @@ func ValidateCEPAndDispatch(w http.ResponseWriter, r *http.Request) {
 
 	if !match {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		w.Write([]byte("Regex validation was not passed"))
+		w.Write([]byte("Invalid zipcode"))
 		return
 	}
 
