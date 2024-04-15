@@ -43,6 +43,7 @@ func GetTemperatureByZipCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	apiResponse := dto.WeatherApiOutput{
+		City:  cepResponse.Localidade,
 		TempC: weatherResponse.Current.TempC,
 		TempF: weatherResponse.Current.TempF,
 		TempK: weatherResponse.Current.TempC + 273.15,
