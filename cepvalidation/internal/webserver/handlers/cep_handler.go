@@ -42,7 +42,8 @@ func ValidateCEPAndDispatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := http.Get("http://weatherbycep:8081/" + cepRequestBody.Cep)
+	ctx := r.Context()
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://weatherbycep:8081/"+cepRequestBody.Cep, nil)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -50,9 +51,18 @@ func ValidateCEPAndDispatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if res.StatusCode != http.StatusOK {
-		w.WriteHeader(res.StatusCode)
-		body, err := io.ReadAll(res.Body)
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
+	resp, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		w.WriteHeader(resp.StatusCode)
+		body, err := io.ReadAll(resp.Body)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -65,7 +75,7 @@ func ValidateCEPAndDispatch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var apiOutput dto.ApiOutput
-	err = json.NewDecoder(res.Body).Decode(&apiOutput)
+	err = json.NewDecoder(resp.Body).Decode(&apiOutput)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
