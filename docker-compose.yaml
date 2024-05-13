@@ -6,6 +6,8 @@ services:
       context: ./cepvalidation
     ports:
       - "8080:8080"
+    depends_on:
+      - otel-collector
 
   weatherbycep:
     container_name: weatherbycep
@@ -15,3 +17,26 @@ services:
       - WEATHER_API_KEY=e13349934b663c68c345b123833241902
     ports:
       - "8081:8081"
+    depends_on:
+      - otel-collector
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+
+  otel-collector:
+    image: otel/opentelemetry-collector
+    container_name: otel-collector
+    command:
+      - --config=/etc/otelcol-contrib/otel-collector.yaml
+    volumes:
+      - ./.docker/collector/otel-collector.yaml:/etc/otelcol-contrib/otel-collector.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "55678:55678"
+      - "55679:55679"
+    depends_on:
+      - zipkin
