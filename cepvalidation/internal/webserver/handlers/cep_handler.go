@@ -7,6 +7,8 @@ import (
 	"regexp"
 
 	"github.com/LucasBelusso1/go-OTELChallange/cepvalidation/internal/dto"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 func ValidateCEPAndDispatch(w http.ResponseWriter, r *http.Request) {
